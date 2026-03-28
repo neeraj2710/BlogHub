@@ -3,10 +3,12 @@ package com.mardox.bloghub.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.PrintWriter;
 
+@Component
 public class SessionAuthInterceptor implements HandlerInterceptor {
 
     @Override
@@ -37,7 +39,20 @@ public class SessionAuthInterceptor implements HandlerInterceptor {
         request.setAttribute("currentUserId",userId);
         request.setAttribute("currentUserRole",userRole);
 
-        //
+        //role checking code for category add update delete
+
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        if(path.startsWith("/api/categories")){
+            if(!method.equals("get") && !userRole.equals("ADMIN")){
+                response.setStatus(403);//Forbidden
+                response.setContentType("application/json");
+                PrintWriter pw = response.getWriter();
+                pw.write("{\"error\" : \"Admin access required\"}");
+                return false;
+            }
+        }
 
         return true;
     }
