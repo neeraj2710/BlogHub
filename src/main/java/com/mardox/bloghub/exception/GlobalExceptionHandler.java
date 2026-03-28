@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMap,HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex){
         ErrorResponse er = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
         return new ResponseEntity<>(er,HttpStatus.INTERNAL_SERVER_ERROR);

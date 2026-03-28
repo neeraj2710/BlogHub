@@ -64,7 +64,7 @@ public class AuthService {
                 author.getName(),
                 author.getEmail(),
                 author.getRole(),
-                "Registration Successful"
+                "Login Successful"
         );
 
     }
