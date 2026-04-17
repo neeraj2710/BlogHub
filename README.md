@@ -1,23 +1,46 @@
-# BlogHub — REST API
+# 📝 BlogHub — Full-Stack Blogging Platform
 
-A session-based blogging platform built with Spring Boot. Authors can register, write posts, manage categories (admin only), and search/browse content via a clean REST API.
+A full-stack blogging platform with a **Vanilla JS + HTML/CSS frontend** and a **Spring Boot REST API** backend. Authors can register, write posts, manage categories (admin only), and search/browse content seamlessly.
 
----
-
-## Table of Contents
-
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Use Case Diagram](#use-case-diagram)
-- [ER Diagram](#er-diagram)
-- [Data Flow Diagram](#data-flow-diagram)
-- [Directory Structure](#directory-structure)
-- [API Reference](#api-reference)
-- [Getting Started](#getting-started)
+![Java](https://img.shields.io/badge/Java-25-orange?style=flat-square&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.4-brightgreen?style=flat-square&logo=springboot)
+![MySQL](https://img.shields.io/badge/MySQL-8-blue?style=flat-square&logo=mysql)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square&logo=javascript)
+![HTML5](https://img.shields.io/badge/HTML-5-orange?style=flat-square&logo=html5)
+![CSS3](https://img.shields.io/badge/CSS-3-blue?style=flat-square&logo=css3)
+![Maven](https://img.shields.io/badge/Maven-3.9+-red?style=flat-square&logo=apachemaven)
 
 ---
 
-## Tech Stack
+## 📚 Table of Contents
+
+- [Tech Stack](#-tech-stack)
+- [Features](#-features)
+- [Use Case Diagram](#-use-case-diagram)
+- [ER Diagram](#-er-diagram)
+- [Data Flow Diagram](#-data-flow-diagram)
+- [Directory Structure](#-directory-structure)
+- [API Reference](#-api-reference)
+- [Getting Started](#-getting-started)
+- [Session Management](#-session-management)
+- [Roles & Permissions](#-roles--permissions)
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+| Layer        | Technology                     |
+|--------------|--------------------------------|
+| Markup       | HTML5                          |
+| Styling      | CSS3 (Custom Properties, Flexbox, Grid) |
+| Scripting    | Vanilla JavaScript (ES6+)      |
+| HTTP Client  | Fetch API                      |
+| Routing      | Client-side (hash-based)       |
+| State        | Session Cookie (`JSESSIONID`)  |
+
+### Backend
 
 | Layer        | Technology                      |
 |--------------|---------------------------------|
@@ -25,23 +48,24 @@ A session-based blogging platform built with Spring Boot. Authors can register, 
 | Language     | Java 25                         |
 | Database     | MySQL 8                         |
 | ORM          | Spring Data JPA / Hibernate     |
-| Auth         | Session-based (HttpSession)     |
+| Auth         | Session-based (`HttpSession`)   |
 | Validation   | Jakarta Bean Validation         |
 | Build Tool   | Maven                           |
 
 ---
 
-## Features
+## ✨ Features
 
-- User registration & session-based login/logout
-- CRUD for blog posts with pagination, sorting, and full-text search
-- Category management (read: all users | write: ADMIN only)
-- Author profile management with role-based access control
-- Global exception handling with structured error responses
+- 🔐 User registration & session-based login / logout
+- 📝 Full CRUD for blog posts with pagination, sorting, and full-text search
+- 🗂️ Category management — read for all users, write for **ADMIN only**
+- 👤 Author profile management with role-based access control
+- 🌐 Interactive frontend — no framework, pure HTML/CSS/JS
+- ⚠️ Global exception handling with structured error responses
 
 ---
 
-## Use Case Diagram
+## 🧩 Use Case Diagram
 
 ```mermaid
 graph TD
@@ -80,7 +104,7 @@ graph TD
 
 ---
 
-## ER Diagram
+## 🗃️ ER Diagram
 
 ```mermaid
 erDiagram
@@ -114,7 +138,7 @@ erDiagram
 
 ---
 
-## Data Flow Diagram
+## 🔄 Data Flow Diagram
 
 ### Level 0 — Context Diagram
 
@@ -132,6 +156,11 @@ graph LR
 ```mermaid
 flowchart TD
     Client([Client])
+
+    subgraph Frontend
+        FE[HTML / CSS / JS Pages]
+        FA[Fetch API Calls]
+    end
 
     subgraph API Layer
         AC[AuthController\n/api/auth]
@@ -159,8 +188,9 @@ flowchart TD
 
     DB[(MySQL\nbloghub_db)]
 
-    Client -- "POST /register\nPOST /login" --> AC
-    Client -- "All other /api/**" --> SI
+    Client --> FE --> FA
+    FA -- "POST /register\nPOST /login" --> AC
+    FA -- "All other /api/**" --> SI
     SI -- "401 if no session\n403 if not ADMIN" --> Client
     SI --> UC & CC & PC
 
@@ -183,13 +213,13 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
+    participant B as Browser (JS)
     participant AC as AuthController
     participant AS as AuthService
     participant AR as AuthorRepository
     participant DB as MySQL
 
-    C->>AC: POST /api/auth/login {email, password}
+    B->>AC: POST /api/auth/login {email, password}
     AC->>AS: login(LoginRequestDto, HttpSession)
     AS->>AR: findByEmail(email)
     AR->>DB: SELECT * FROM authors WHERE email=?
@@ -198,12 +228,12 @@ sequenceDiagram
     AS-->>AS: Validate password match
     AS-->>AS: session.setAttribute(userId, role, ...)
     AS-->>AC: AuthResponseDto
-    AC-->>C: 200 OK + Set-Cookie: JSESSIONID
+    AC-->>B: 200 OK + Set-Cookie: JSESSIONID
 ```
 
 ---
 
-## Directory Structure
+## 📁 Directory Structure
 
 ```
 BlogHub/
@@ -214,14 +244,14 @@ BlogHub/
 └── src/
     ├── main/
     │   ├── java/com/mardox/bloghub/
-    │   │   ├── BlogHubApplication.java          # Entry point
+    │   │   ├── BlogHubApplication.java             # Entry point
     │   │   ├── config/
-    │   │   │   └── WebConfig.java               # Registers interceptor
+    │   │   │   └── WebConfig.java                  # Registers interceptor
     │   │   ├── controller/
-    │   │   │   ├── AuthController.java           # /api/auth
-    │   │   │   ├── AuthorController.java         # /api/users
-    │   │   │   ├── CategoryController.java       # /api/categories
-    │   │   │   └── PostController.java           # /api/posts
+    │   │   │   ├── AuthController.java              # /api/auth
+    │   │   │   ├── AuthorController.java            # /api/users
+    │   │   │   ├── CategoryController.java          # /api/categories
+    │   │   │   └── PostController.java              # /api/posts
     │   │   ├── dto/
     │   │   │   ├── AuthResponseDto.java
     │   │   │   ├── AuthorResponseDto.java
@@ -235,16 +265,16 @@ BlogHub/
     │   │   │   ├── PostUpdateDto.java
     │   │   │   └── RegisterRequestDto.java
     │   │   ├── entity/
-    │   │   │   ├── Author.java                  # authors table
-    │   │   │   ├── Category.java                # categories table
-    │   │   │   └── Post.java                    # posts table
+    │   │   │   ├── Author.java                     # authors table
+    │   │   │   ├── Category.java                   # categories table
+    │   │   │   └── Post.java                       # posts table
     │   │   ├── exception/
     │   │   │   ├── ErrorResponse.java
     │   │   │   ├── GlobalExceptionHandler.java
     │   │   │   ├── ResouceAlreadyExistsException.java
     │   │   │   └── ResourceNotFoundException.java
     │   │   ├── interceptor/
-    │   │   │   └── SessionAuthInterceptor.java  # Auth guard
+    │   │   │   └── SessionAuthInterceptor.java     # Auth guard
     │   │   ├── repository/
     │   │   │   ├── AuthorRepository.java
     │   │   │   ├── CategoryRepository.java
@@ -255,6 +285,10 @@ BlogHub/
     │   │       ├── CategoryService.java
     │   │       └── PostService.java
     │   └── resources/
+    │       ├── static/                             # Frontend (HTML/CSS/JS)
+    │       │   ├── index.html
+    │       │   ├── css/
+    │       │   └── js/
     │       └── application.properties
     └── test/
         └── java/com/mardox/bloghub/
@@ -263,63 +297,63 @@ BlogHub/
 
 ---
 
-## API Reference
+## 📡 API Reference
 
-Base URL: `http://localhost:8082`
+**Base URL:** `http://localhost:8082`
 
 > All endpoints except `/api/auth/**` require an active session (cookie `JSESSIONID`).
 
 ---
 
-### Auth — `/api/auth`
+### 🔑 Auth — `/api/auth`
 
-| Method | Endpoint             | Auth Required | Body / Params           | Description                  |
-|--------|----------------------|---------------|-------------------------|------------------------------|
-| POST   | `/api/auth/register` | No            | RegisterRequestDto      | Register a new author        |
-| POST   | `/api/auth/login`    | No            | LoginRequestDto         | Login, starts session        |
-| POST   | `/api/auth/logout`   | Yes           | —                       | Invalidate session           |
-| GET    | `/api/auth/me`       | Yes           | —                       | Get current logged-in user   |
-
----
-
-### Authors — `/api/users`
-
-| Method | Endpoint          | Auth Required | Role        | Description           |
-|--------|-------------------|---------------|-------------|-----------------------|
-| GET    | `/api/users`      | Yes           | Any         | List all authors      |
-| GET    | `/api/users/{id}` | Yes           | Any         | Get author by ID      |
-| PUT    | `/api/users/{id}` | Yes           | Self/Admin  | Update author profile |
-| DELETE | `/api/users/{id}` | Yes           | Self/Admin  | Delete author         |
+| Method | Endpoint              | Auth Required | Description               |
+|--------|-----------------------|:-------------:|---------------------------|
+| POST   | `/api/auth/register`  | ❌            | Register a new author      |
+| POST   | `/api/auth/login`     | ❌            | Login, starts session      |
+| POST   | `/api/auth/logout`    | ✅            | Invalidate session         |
+| GET    | `/api/auth/me`        | ✅            | Get current logged-in user |
 
 ---
 
-### Categories — `/api/categories`
+### 👤 Authors — `/api/users`
 
-| Method | Endpoint               | Auth Required | Role  | Description            |
-|--------|------------------------|---------------|-------|------------------------|
-| GET    | `/api/categories`      | Yes           | Any   | List all categories    |
-| GET    | `/api/categories/{id}` | Yes           | Any   | Get category by ID     |
-| POST   | `/api/categories`      | Yes           | ADMIN | Create category        |
-| PUT    | `/api/categories/{id}` | Yes           | ADMIN | Update category        |
-| DELETE | `/api/categories/{id}` | Yes           | ADMIN | Delete category        |
-
----
-
-### Posts — `/api/posts`
-
-| Method | Endpoint               | Auth Required | Role       | Description                              |
-|--------|------------------------|---------------|------------|------------------------------------------|
-| GET    | `/api/posts`           | Yes           | Any        | Paginated posts (`page`, `size`, `sortBy`, `sortDir`) |
-| GET    | `/api/posts/getAll`    | Yes           | Any        | All posts or search (`?term=keyword`)    |
-| GET    | `/api/posts/{id}`      | Yes           | Any        | Get post by ID                           |
-| GET    | `/api/posts/my-post`   | Yes           | Any        | Get current user's posts                 |
-| POST   | `/api/posts`           | Yes           | Any        | Create post                              |
-| PUT    | `/api/posts/{id}`      | Yes           | Self/Admin | Update post                              |
-| DELETE | `/api/posts/{id}`      | Yes           | Self/Admin | Delete post                              |
+| Method | Endpoint           | Auth Required | Role       | Description            |
+|--------|--------------------|:-------------:|:----------:|------------------------|
+| GET    | `/api/users`       | ✅            | Any        | List all authors       |
+| GET    | `/api/users/{id}`  | ✅            | Any        | Get author by ID       |
+| PUT    | `/api/users/{id}`  | ✅            | Self/Admin | Update author profile  |
+| DELETE | `/api/users/{id}`  | ✅            | Self/Admin | Delete author          |
 
 ---
 
-### Error Responses
+### 🗂️ Categories — `/api/categories`
+
+| Method | Endpoint                  | Auth Required | Role  | Description         |
+|--------|---------------------------|:-------------:|:-----:|---------------------|
+| GET    | `/api/categories`         | ✅            | Any   | List all categories |
+| GET    | `/api/categories/{id}`    | ✅            | Any   | Get category by ID  |
+| POST   | `/api/categories`         | ✅            | ADMIN | Create category     |
+| PUT    | `/api/categories/{id}`    | ✅            | ADMIN | Update category     |
+| DELETE | `/api/categories/{id}`    | ✅            | ADMIN | Delete category     |
+
+---
+
+### 📝 Posts — `/api/posts`
+
+| Method | Endpoint              | Auth Required | Role       | Description                                              |
+|--------|-----------------------|:-------------:|:----------:|----------------------------------------------------------|
+| GET    | `/api/posts`          | ✅            | Any        | Paginated posts (`page`, `size`, `sortBy`, `sortDir`)   |
+| GET    | `/api/posts/getAll`   | ✅            | Any        | All posts or search (`?term=keyword`)                   |
+| GET    | `/api/posts/{id}`     | ✅            | Any        | Get post by ID                                          |
+| GET    | `/api/posts/my-post`  | ✅            | Any        | Get current user's posts                                |
+| POST   | `/api/posts`          | ✅            | Any        | Create post                                             |
+| PUT    | `/api/posts/{id}`     | ✅            | Self/Admin | Update post                                             |
+| DELETE | `/api/posts/{id}`     | ✅            | Self/Admin | Delete post                                             |
+
+---
+
+### ⚠️ Error Responses
 
 | HTTP Status | Scenario                          |
 |-------------|-----------------------------------|
@@ -338,7 +372,7 @@ Base URL: `http://localhost:8082`
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -348,36 +382,40 @@ Base URL: `http://localhost:8082`
 
 ### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/bloghub.git
-   cd bloghub
-   ```
+**1. Clone the repository**
 
-2. **Configure the database**
+```bash
+git clone https://github.com/neeraj2710/BlogHub.git
+cd BlogHub
+```
 
-   Edit `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/bloghub_db?createDatabaseIfNotExist=true
-   spring.datasource.username=your_mysql_username
-   spring.datasource.password=your_mysql_password
-   ```
+**2. Configure the database**
 
-3. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
+Edit `src/main/resources/application.properties`:
 
-4. **The API will be available at**
-   ```
-   http://localhost:8082
-   ```
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/bloghub_db?createDatabaseIfNotExist=true
+spring.datasource.username=your_mysql_username
+spring.datasource.password=your_mysql_password
+```
+
+**3. Run the application**
+
+```bash
+./mvnw spring-boot:run
+```
+
+**4. Open in browser**
+
+```
+http://localhost:8082
+```
 
 > The database schema is auto-created by Hibernate on first run (`ddl-auto=update`).
 
 ---
 
-### Quick Test (cURL)
+### 🧪 Quick Test (cURL)
 
 ```bash
 # Register
@@ -390,7 +428,7 @@ curl -c cookies.txt -X POST http://localhost:8082/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"alice@example.com","password":"pass123"}'
 
-# Create a post (requires category to exist first)
+# Create a post (requires a category to exist first)
 curl -b cookies.txt -X POST http://localhost:8082/api/posts \
   -H "Content-Type: application/json" \
   -d '{"title":"Hello World","content":"My first post.","categoryId":1}'
@@ -398,22 +436,28 @@ curl -b cookies.txt -X POST http://localhost:8082/api/posts \
 
 ---
 
-## Session Management
+## 🔒 Session Management
 
-| Attribute       | Value                      |
-|-----------------|----------------------------|
-| Session timeout | 30 minutes                 |
-| Cookie name     | `JSESSIONID`               |
-| HTTP-only       | Yes                        |
-| Same-site       | Lax                        |
+| Attribute        | Value              |
+|------------------|--------------------|
+| Session timeout  | 30 minutes         |
+| Cookie name      | `JSESSIONID`       |
+| HTTP-only        | Yes                |
+| Same-site        | Lax                |
 
 Session attributes set on login: `userId`, `userName`, `userEmail`, `userRole`
 
 ---
 
-## Roles
+## 👥 Roles & Permissions
 
-| Role  | Permissions                                                   |
-|-------|---------------------------------------------------------------|
-| USER  | CRUD own posts, read-only on categories, manage own profile   |
-| ADMIN | All USER permissions + manage all categories, delete any post/user |
+| Role  | Permissions                                                                 |
+|-------|-----------------------------------------------------------------------------|
+| USER  | CRUD own posts · Read-only on categories · Manage own profile               |
+| ADMIN | All USER permissions + manage all categories · Delete any post or user      |
+
+---
+
+<div align="center">
+  Made with ❤️ by <a href="https://github.com/neeraj2710">Neeraj</a>
+</div>
