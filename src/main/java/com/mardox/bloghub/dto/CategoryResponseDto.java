@@ -12,5 +12,6 @@ public class CategoryResponseDto {
     private Long id;
     private String catName;
     private String descr;
+    private int postCount;
 
 }

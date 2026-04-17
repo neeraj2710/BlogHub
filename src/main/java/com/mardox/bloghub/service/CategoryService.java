@@ -9,6 +9,7 @@ import com.mardox.bloghub.exception.ResourceNotFoundException;
 import com.mardox.bloghub.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,12 +31,18 @@ public class CategoryService {
         category.setCatName(createDto.getCatName());
         category.setDescription(createDto.getDescr());
         Category saveCat = repository.save(category);
-        return new CategoryResponseDto(saveCat.getId(), saveCat.getCatName(), saveCat.getDescription());
+        return new CategoryResponseDto(saveCat.getId(), saveCat.getCatName(), saveCat.getDescription(), 0);
     }
 
+    @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAll(){
         return repository.findAll().stream().map(
-                category -> new CategoryResponseDto(category.getId(), category.getCatName(),category.getDescription())
+                category -> new CategoryResponseDto(
+                        category.getId(),
+                        category.getCatName(),
+                        category.getDescription(),
+                        category.getPostList() != null ? category.getPostList().size() : 0
+                )
         ).collect(Collectors.toList());
     }
 
@@ -43,7 +50,7 @@ public class CategoryService {
         Category cat = repository.findById(id).orElseThrow(
                 ()-> new ResourceNotFoundException("Category with id : "+id+" does not exists")
         );
-        return new CategoryResponseDto(cat.getId(),cat.getCatName(), cat.getDescription());
+        return new CategoryResponseDto(cat.getId(), cat.getCatName(), cat.getDescription(), 0);
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryUpdateDto updateDto){
@@ -57,7 +64,7 @@ public class CategoryService {
         if(updateDto.getDescr() != null)
             cat.setDescription(updateDto.getDescr());
         Category saveCat = repository.save(cat);
-        return new CategoryResponseDto(saveCat.getId(), saveCat.getCatName(), saveCat.getDescription());
+        return new CategoryResponseDto(saveCat.getId(), saveCat.getCatName(), saveCat.getDescription(), 0);
     }
 
     public void deleteCategory(Long id){

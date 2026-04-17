@@ -11,6 +11,7 @@
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
   --border-color: #e5e7eb;
+  --navbar-bg: rgba(255, 255, 255, 0.95);
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
@@ -29,6 +30,7 @@
   --bg-secondary: #1f2937;
   --bg-tertiary: #374151;
   --border-color: #374151;
+  --navbar-bg: rgba(17, 24, 39, 0.95);
 }
 
 * {
@@ -48,13 +50,12 @@ body {
 
 /* Navigation */
 .navbar {
-  background: var(--bg-primary);
+  background: var(--navbar-bg);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
 }
 
 .nav-container {

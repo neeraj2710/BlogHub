@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlogHub - Login</title>
@@ -387,9 +388,9 @@
                 const data = await response.json();
 
                 // Save user info (session cookie is automatically stored by browser)
-                sessionStorage.setItem('userId', data.userId);
-                sessionStorage.setItem('userName', data.userName);
-                sessionStorage.setItem('userEmail', data.userEmail);
+                sessionStorage.setItem('userId', data.id);
+                sessionStorage.setItem('userName', data.name);
+                sessionStorage.setItem('userEmail', data.email);
                 sessionStorage.setItem('userRole', data.role);
 
                 // Show success

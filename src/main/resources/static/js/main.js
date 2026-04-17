@@ -2,29 +2,31 @@
 
 // Theme toggle
 function toggleTheme() {
-  const body = document.body;
-  const currentTheme = body.getAttribute("data-theme");
+  const currentTheme = document.documentElement.getAttribute("data-theme");
   const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-  body.setAttribute("data-theme", newTheme);
+  document.documentElement.setAttribute("data-theme", newTheme);
   localStorage.setItem("theme", newTheme);
 
-  const themeIcon = document.querySelector(".theme-toggle i");
+  const themeIcon = document.querySelector(".theme-toggle i, .theme-toggle-login i");
   if (themeIcon) {
     themeIcon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
   }
 }
 
-// Initialize theme
+// Initialize theme (syncs icon only — data-theme is already set by inline head script)
 function initTheme() {
   const savedTheme = localStorage.getItem("theme") || "light";
-  document.body.setAttribute("data-theme", savedTheme);
+  document.documentElement.setAttribute("data-theme", savedTheme);
 
-  const themeIcon = document.querySelector(".theme-toggle i");
+  const themeIcon = document.querySelector(".theme-toggle i, .theme-toggle-login i");
   if (themeIcon) {
     themeIcon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
   }
 }
+
+// Auto-initialize theme on every page that includes main.js
+document.addEventListener("DOMContentLoaded", initTheme);
 
 // Simple API GET (with session cookies)
 async function apiGet(url) {
@@ -113,13 +115,18 @@ function showToast(message, type = "info") {
 function updateNavbar() {
   const userName = sessionStorage.getItem('userName');
   const userRole = sessionStorage.getItem('userRole');
-  
+
   if (!userName) return;
 
   // Add user info to navbar
   const navActions = document.querySelector('.nav-actions');
   if (navActions) {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const iconClass = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     navActions.innerHTML = `
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="${iconClass}"></i>
+      </button>
       <span style="color: var(--text-primary); margin-right: 10px;">
         👤 ${userName} ${userRole === 'ADMIN' ? '(Admin)' : ''}
       </span>

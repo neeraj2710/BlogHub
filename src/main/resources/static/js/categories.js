@@ -50,7 +50,7 @@ function displayCategories(categories) {
     card.innerHTML = `
       <h3>${category.catName}</h3>
       <p>${category.descr || "No description available"}</p>
-      <span>${category.posts ? category.posts.length : 0} posts</span>
+      <span>${category.postCount ?? 0} posts</span>
       <button class="delete-btn" data-id="${category.id}">
         🗑 Delete
       </button>
