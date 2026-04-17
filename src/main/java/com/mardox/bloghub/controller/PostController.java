@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/posts")
 public class PostController {
 
     private PostService service;
@@ -29,7 +29,7 @@ public class PostController {
         this.service = service;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody @Valid PostRequestDto dto, HttpSession session){
         Long id = (Long)session.getAttribute("userId");
         dto.setAuthorId(id);
@@ -70,7 +70,7 @@ public class PostController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "3")int size,
@@ -95,6 +95,7 @@ public class PostController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/my-post")
     public ResponseEntity<List<PostResponseDto>> getMyPost(@RequestAttribute("currentUserId")Long id){
         List<PostResponseDto> dtoList = service.getPostByAuthor(id).stream().map(
                 post -> {
@@ -138,6 +139,7 @@ public class PostController {
         return ResponseEntity.ok(updatedDto);
     }
 
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(
             @PathVariable Long id,
             @RequestAttribute("currentUserId") Long userId,
